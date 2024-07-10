@@ -26,7 +26,7 @@ async def get_image_description(image_url: str, prompt: str) -> str:
     """
     try:
         response = client.chat.completions.create(
-            model="gpt-4-vision-preview",
+            model="gpt-4o",
             messages=[
                 {
                     "role": "user",
