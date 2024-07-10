@@ -4,6 +4,9 @@ from discord.ext import commands
 import aiohttp
 import ssl
 import logging
+import os
+from aiohttp import web
+import asyncio
 
 from config import DISCORD_TOKEN, LOG_LEVEL
 from exceptions import ImageProcessingError, SongGenerationError
@@ -22,6 +25,29 @@ ssl_context.verify_mode = ssl.CERT_NONE
 
 connector = aiohttp.TCPConnector(ssl=ssl_context)
 bot = commands.Bot(command_prefix='!', intents=intents, connector=connector)
+
+
+async def handle(request):
+    return web.Response(text="Bot is running!")
+
+app = web.Application()
+app.router.add_get("/", handle)
+
+
+async def run_bot():
+    try:
+        await bot.start(DISCORD_TOKEN)
+    except Exception as e:
+        logger.error(f"Error running bot: {e}", exc_info=True)
+
+
+async def run_app():
+    port = int(os.environ.get("PORT", 8080))
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, '0.0.0.0', port)
+    await site.start()
+    logger.info(f"Web server started on port {port}")
 
 
 @bot.event
@@ -78,4 +104,7 @@ async def roast_me(interaction: discord.Interaction, image: discord.Attachment):
 
 # Run the bot
 if __name__ == "__main__":
-    bot.run(DISCORD_TOKEN)
+    loop = asyncio.get_event_loop()
+    loop.create_task(run_bot())
+    loop.create_task(run_app())
+    loop.run_forever()
