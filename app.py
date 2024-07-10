@@ -5,14 +5,11 @@ import aiohttp
 from openai import OpenAI
 import requests
 import time
-from dotenv import load_dotenv
 import ssl
 
-load_dotenv()
-
-DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
-OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
-SUNO_API_URL = os.getenv('SUNO_API_URL')
+DISCORD_TOKEN = os.environ.get('DISCORD_TOKEN')
+OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
+SUNO_API_URL = os.environ.get('SUNO_API_URL')
 
 if not DISCORD_TOKEN:
     raise ValueError("DISCORD_TOKEN is not set in the environment variables")
